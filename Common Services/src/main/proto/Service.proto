@@ -1,0 +1,49 @@
+syntax = "proto3";
+option java_multiple_files = true;
+option java_generic_services = true;
+package uk.startup.grpc.test;
+
+message GetResourceDataRequest {
+    string requestId = 1;
+    string resourceUrl = 2;
+}
+
+message StatusResponse {
+    bool status = 1;
+    string error = 2;
+}
+
+message VoidResponse {
+
+}
+
+service ResourceDataServer {
+    rpc getResourceData(GetResourceDataRequest) returns (VoidResponse);
+}
+
+message ResourceHeaders {
+    string requestId = 1;
+    map<string, string> headers = 2;
+}
+
+message ResourceBody {
+    string requestId = 1;
+    bytes chunk = 2;
+    int32 size = 3;
+}
+
+message RequestErrors {
+    string requestId = 1;
+    repeated string errors = 2;
+}
+
+message RequestCompleted {
+    string requestId = 1;
+}
+
+service ResourceDataClient {
+    rpc sendResourceHeaders(ResourceHeaders) returns(VoidResponse);
+    rpc sendResourceBody(stream ResourceBody) returns(StatusResponse);
+    rpc onCompleted(RequestCompleted) returns(VoidResponse);
+    rpc onErrors(RequestErrors) returns(VoidResponse);
+}
